@@ -704,36 +704,3 @@ def base_ml_train(classifiers, project_path, input_path, output_file, K=5):
 
     return results
 
-# '''
-# if __name__ == "__main__":
-#
-#     project_path = 'MLB-Injuries-Analysis/'
-#     input_path = "processed_data.csv"
-#     target = 'Injured'
-#     output_file = project_path + 'out/'
-#     # 确保输出目录存在
-#     os.makedirs(output_file, exist_ok=True)
-#     # 新增：创建折数结果保存子目录
-#     fold_results_dir = os.path.join(output_file, "fold_results/")
-#     os.makedirs(fold_results_dir, exist_ok=True)
-#
-#     # 初始化分类器列表
-#     classifiers = [
-#         ('Logistic Regression', LogisticRegression()),
-#         # ('SVM', SVC(probability=True)),
-#         ('KNN', KNeighborsClassifier()),
-#         ('Naive Bayes', GaussianNB()),
-#         ('Decision Tree', DecisionTreeClassifier()),
-#         ('Random Forest', RandomForestClassifier()),
-#         ('GBDT', GradientBoostingClassifier()),
-#         ('HGBDT', HistGradientBoostingClassifier()),
-#         ('AdaBoost', AdaBoostClassifier()),
-#         # ('CatBoost', CatBoostClassifier(logging_level='Silent')),  # 关键：禁用日志输出，不创建catboost_info目录
-#         ('Extra Trees', ExtraTreesClassifier()),
-#         ('LGBM', LGBMClassifier()),
-#         ('Bagging', BaggingClassifier(base_estimator=DecisionTreeClassifier(random_state=42), random_state=42)),
-#         ("XGBoost", XGBClassifier(eval_metric='logloss', use_label_encoder=False))
-#     ]
-#
-
-#     base_ml_train(classifiers, project_path, input_path, output_file, K=5)
