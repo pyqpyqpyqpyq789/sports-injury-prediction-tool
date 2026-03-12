@@ -8,7 +8,7 @@ from sklearn.calibration import calibration_curve
 from sklearn.metrics import brier_score_loss, roc_curve
 
 # ===================== 全局论文级可视化参数 =====================
-plt.rcParams['font.family'] = 'Times New Roman'  # 统一字体
+plt.rcParams['font.family'] = 'DejaVu Sans'  # 统一字体
 plt.rcParams['font.size'] = 12  # 基础字号
 plt.rcParams['axes.linewidth'] = 1.0  # 坐标轴线条粗细
 plt.rcParams['xtick.major.width'] = 1.0
