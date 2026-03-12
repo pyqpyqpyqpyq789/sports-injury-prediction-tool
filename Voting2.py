@@ -650,22 +650,22 @@ def Explain(model_results, sample_id, model_metr, target, names, project_path):
 
     # --------------- 绘制论文级校准曲线 ---------------
     os.makedirs(project_path+'plots/', exist_ok=True)
-    # plot_paper_calibration(
-    #         y_true=y_list,
-    #         y_proba=y_positive_proba,
-    #         model_name=names,
-    #         n_bins=10,  # 10组分组（论文常用）
-    #         n_boot=1000,  # 1000次Bootstrapping
-    #         plot_youden=True,  # 标注Youden J阈值（可选关闭）
-    #         save_path=project_path + "plots/calibration_curve.jpg"  # 保存为PDF（矢量图）
-    #     )
-    # # --------------- Bootstrapping计算DCA ---------------
-    # print('阳性样本数量：', np.sum(np.array(y_list) == 1))
-    # Bootstrap计算DCA数据
-    # thresholds, mean_nb, lb_nb, ub_nb, nb_all, nb_none = bootstrap_dca(np.array(y_list), np.array(y_positive_proba), n_boot=1000)
+    plot_paper_calibration(
+            y_true=y_list,
+            y_proba=y_positive_proba,
+            model_name=names,
+            n_bins=10,  # 10组分组（论文常用）
+            n_boot=1000,  # 1000次Bootstrapping
+            plot_youden=True,  # 标注Youden J阈值（可选关闭）
+            save_path=project_path + "plots/calibration_curve.jpg"  # 保存为PDF（矢量图）
+        )
+    # --------------- Bootstrapping计算DCA ---------------
+    print('阳性样本数量：', np.sum(np.array(y_list) == 1))
+    Bootstrap计算DCA数据
+    thresholds, mean_nb, lb_nb, ub_nb, nb_all, nb_none = bootstrap_dca(np.array(y_list), np.array(y_positive_proba), n_boot=1000)
     # print(f"thresholds 维度：{thresholds.ndim}")
-    # # 绘制三条核心曲线
-    # plot_dca_curves(thresholds, mean_nb, lb_nb, ub_nb, nb_all, nb_none, save_path=project_path+"plots/dca_bootstrap.jpg")
+    # 绘制三条核心曲线
+    plot_dca_curves(thresholds, mean_nb, lb_nb, ub_nb, nb_all, nb_none, save_path=project_path+"plots/dca_bootstrap.jpg")
 
     # advance_summary_plot(merged_shap, X.iloc[X_id], show=False)
     # plt.tight_layout()
@@ -688,40 +688,40 @@ def Explain(model_results, sample_id, model_metr, target, names, project_path):
     # shap.save_html(project_path + 'plots/force_plot.html',
     #                shap.force_plot(Expected, merged_shap, X.iloc[X_id]))
 
-    # 绘制shap决策图
-    error_indices = np.where(y_pred_list != y_list)[0]
-    print('error_indices', error_indices)
-    # # 多样本可视化探索
-    shap.decision_plot(Expected, merged_shap, X.iloc[X_id],
-                       highlight=error_indices,  # 突出显示错误样本（核心参数）
-                       show=False,
-                       ignore_warnings=True)
-    plt.title('SHAP decision plot')
-    plt.tight_layout()
-    plt.savefig(project_path + 'plots/decision.jpg', dpi=300, bbox_inches='tight')
-    plt.close()
+    # # 绘制shap决策图
+    # error_indices = np.where(y_pred_list != y_list)[0]
+    # print('error_indices', error_indices)
+    # # # 多样本可视化探索
+    # shap.decision_plot(Expected, merged_shap, X.iloc[X_id],
+    #                    highlight=error_indices,  # 突出显示错误样本（核心参数）
+    #                    show=False,
+    #                    ignore_warnings=True)
+    # plt.title('SHAP decision plot')
+    # plt.tight_layout()
+    # plt.savefig(project_path + 'plots/decision.jpg', dpi=300, bbox_inches='tight')
+    # plt.close()
     # Deci_plot(y_pred=y_pred_list, y_true=y_true_list, sample_index=3)  # 绘制shap决策图
 
-    # 指定样本绘制瀑布图
-    # sample_index = 19
-    shap.plots.waterfall(shap_values=explainer(X.iloc[X_id])[sample_id], show=False)
-    plt.title(f'SHAP waterfall plot (sample ID = {sample_id})')
-    plt.tight_layout()
-    plt.savefig(project_path + f'plots/waterfall_{sample_id}.jpg', dpi=300, bbox_inches='tight')
-    plt.close()
+    # # 指定样本绘制瀑布图
+    # # sample_index = 19
+    # shap.plots.waterfall(shap_values=explainer(X.iloc[X_id])[sample_id], show=False)
+    # plt.title(f'SHAP waterfall plot (sample ID = {sample_id})')
+    # plt.tight_layout()
+    # plt.savefig(project_path + f'plots/waterfall_{sample_id}.jpg', dpi=300, bbox_inches='tight')
+    # plt.close()
 
-    # 使用heatmap绘制SHAP值
-    shap_explainer = shap.Explanation(
-        values=merged_shap,  # 你的 SHAP 值数组
-        base_values=Expected,  # 背景期望
-        data=X.iloc[id_].values,  # 对应的特征数据
-        feature_names=X.columns.tolist()
-    )
-    shap.plots.heatmap(shap_explainer, show=False)
-    plt.title('SHAP heatmap')
-    plt.tight_layout()
-    plt.savefig(project_path + 'plots/heatmap.jpg', dpi=300, bbox_inches='tight')
-    plt.close()
+    # # 使用heatmap绘制SHAP值
+    # shap_explainer = shap.Explanation(
+    #     values=merged_shap,  # 你的 SHAP 值数组
+    #     base_values=Expected,  # 背景期望
+    #     data=X.iloc[id_].values,  # 对应的特征数据
+    #     feature_names=X.columns.tolist()
+    # )
+    # shap.plots.heatmap(shap_explainer, show=False)
+    # plt.title('SHAP heatmap')
+    # plt.tight_layout()
+    # plt.savefig(project_path + 'plots/heatmap.jpg', dpi=300, bbox_inches='tight')
+    # plt.close()
 
 
 # 主函数
@@ -800,6 +800,7 @@ if __name__ == "__main__":
     if not os.path.exists(project_path+'plots'):
         os.makedirs(project_path+'plots')
     main()
+
 
 
 
