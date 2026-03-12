@@ -6,7 +6,8 @@ from tqdm import tqdm
 warnings.filterwarnings('ignore')
 
 # ===================== 全局论文级可视化设置 =====================
-plt.rcParams['font.family'] = 'DejaVu Sans'
+plt.rcParams['font.family'] = 'Times New Roman'
+# plt.rcParams['font.family'] = 'DejaVu Sans'
 plt.rcParams['font.size'] = 12
 plt.rcParams['axes.linewidth'] = 1.0
 plt.rcParams['xtick.major.width'] = 1.0
@@ -23,30 +24,18 @@ COLOR_NONE = '#2ca02c'  # 无干预：绿色
 ALPHA_CI = 0.3
 
 
-def force_1d_array(arr, name="array"):
-    """
-    强制将输入转为一维numpy数组，避免0维/多维问题
-    :param arr: 标量/列表/数组
-    :param name: 数组名称（用于报错提示）
-    :return: 一维numpy数组
-    """
-    # 1. 转为数组
-    arr = np.asarray(arr)
-    # 2. 展平为一维（即使是多维/0维）
-    arr = arr.ravel()
-    # 3. 校验（空数组兜底）
-    if arr.ndim != 1:
-        raise ValueError(f"{name} 必须是一维数组！当前维度：{arr.ndim}")
-    return arr
-
-
 # ===================== 核心函数：计算净获益 =====================
 def calculate_net_benefit(y_true, y_proba, thresholds):
+    # 先强制输入维度
+    y_true = np.atleast_1d(y_true)
+    y_proba = np.atleast_1d(y_proba)
+    thresholds = np.atleast_1d(thresholds)
+
     """计算模型净获益"""
     n_total = len(y_true)
     n_pos = np.sum(y_true == 1)
     net_benefit = np.zeros_like(thresholds)
-    net_benefit = force_1d_array(net_benefit, name="net_benefit")
+
     for i, t in enumerate(thresholds):
         if t <= 0 or t >= 1:
             net_benefit[i] = 0
@@ -69,27 +58,70 @@ def calculate_net_benefit_none(thresholds):
 
 
 # ===================== Bootstrap计算模型置信区间 =====================
+# def bootstrap_dca(y_true, y_proba, n_boot=1000, seed=42):
+#     np.random.seed(seed)
+#     thresholds = np.linspace(0.01, 0.99, 100)
+#     thresholds = np.atleast_1d(thresholds)
+#     boot_nb = np.zeros((n_boot, len(thresholds)))
+#
+#     for i in tqdm(range(n_boot), desc="Bootstrapping DCA"):
+#         idx = np.random.choice(len(y_true), size=len(y_true), replace=True)
+#         y_boot = y_true[idx]
+#         y_proba_boot = y_proba[idx]
+#         boot_nb[i, :] = calculate_net_benefit(y_boot, y_proba_boot, thresholds)
+#
+#     mean_nb = np.mean(boot_nb, axis=0)
+#     lb_nb = np.percentile(boot_nb, 2.5, axis=0)
+#     ub_nb = np.percentile(boot_nb, 97.5, axis=0)
+#
+#     # 计算全干预/无干预净获益
+#     p_pos = np.sum(y_true == 1) / len(y_true)
+#     print('p_pos', p_pos)
+#     nb_all = calculate_net_benefit_all(thresholds, p_pos)
+#     nb_none = calculate_net_benefit_none(thresholds)
+#
+#     return thresholds, mean_nb, lb_nb, ub_nb, nb_all, nb_none
+
+
 def bootstrap_dca(y_true, y_proba, n_boot=1000, seed=42):
     np.random.seed(seed)
+    # 1. 生成thresholds并强制一维（保留你的代码，增加断言）
     thresholds = np.linspace(0.01, 0.99, 100)
-    thresholds = force_1d_array(thresholds, name="thresholds") 
-    boot_nb = np.zeros((n_boot, len(thresholds)))
+    thresholds = np.atleast_1d(thresholds)
+    assert thresholds.ndim == 1, f"thresholds必须是一维！当前维度：{thresholds.ndim}"
+    n_thresholds = len(thresholds)
+
+    # 2. 初始化boot_nb（显式指定维度，避免隐式错误）
+    boot_nb = np.zeros((n_boot, n_thresholds), dtype=np.float64)
 
     for i in tqdm(range(n_boot), desc="Bootstrapping DCA"):
         idx = np.random.choice(len(y_true), size=len(y_true), replace=True)
         y_boot = y_true[idx]
         y_proba_boot = y_proba[idx]
-        boot_nb[i, :] = calculate_net_benefit(y_boot, y_proba_boot, thresholds)
 
+        # 3. 调用calculate_net_benefit后强制一维
+        nb = calculate_net_benefit(y_boot, y_proba_boot, thresholds)
+        nb = np.atleast_1d(nb)  # 关键！确保返回值是一维
+        assert len(nb) == n_thresholds, f"净收益长度异常：{len(nb)} != {n_thresholds}"
+        boot_nb[i, :] = nb  # 此时nb是一维，赋值无问题
+
+    # 4. 计算统计量（确保结果一维）
     mean_nb = np.mean(boot_nb, axis=0)
     lb_nb = np.percentile(boot_nb, 2.5, axis=0)
     ub_nb = np.percentile(boot_nb, 97.5, axis=0)
+    mean_nb, lb_nb, ub_nb = map(np.atleast_1d, [mean_nb, lb_nb, ub_nb])
 
-    # 计算全干预/无干预净获益
+    # 5. 处理p_pos和全干预/无干预净获益（强制返回值一维）
     p_pos = np.sum(y_true == 1) / len(y_true)
     print('p_pos', p_pos)
     nb_all = calculate_net_benefit_all(thresholds, p_pos)
     nb_none = calculate_net_benefit_none(thresholds)
+    # 强制一维兜底
+    nb_all = np.atleast_1d(nb_all)
+    nb_none = np.atleast_1d(nb_none)
+
+    # 最终校验所有返回值维度
+    assert all(arr.ndim == 1 for arr in [thresholds, mean_nb, lb_nb, ub_nb, nb_all, nb_none])
 
     return thresholds, mean_nb, lb_nb, ub_nb, nb_all, nb_none
 
@@ -138,5 +170,3 @@ if __name__ == "__main__":
 
     # 绘制三条核心曲线
     plot_dca_curves(thresholds, mean_nb, lb_nb, ub_nb, nb_all, nb_none)
-
-
