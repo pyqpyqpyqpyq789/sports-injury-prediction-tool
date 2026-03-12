@@ -23,12 +23,30 @@ COLOR_NONE = '#2ca02c'  # 无干预：绿色
 ALPHA_CI = 0.3
 
 
+def force_1d_array(arr, name="array"):
+    """
+    强制将输入转为一维numpy数组，避免0维/多维问题
+    :param arr: 标量/列表/数组
+    :param name: 数组名称（用于报错提示）
+    :return: 一维numpy数组
+    """
+    # 1. 转为数组
+    arr = np.asarray(arr)
+    # 2. 展平为一维（即使是多维/0维）
+    arr = arr.ravel()
+    # 3. 校验（空数组兜底）
+    if arr.ndim != 1:
+        raise ValueError(f"{name} 必须是一维数组！当前维度：{arr.ndim}")
+    return arr
+
+
 # ===================== 核心函数：计算净获益 =====================
 def calculate_net_benefit(y_true, y_proba, thresholds):
     """计算模型净获益"""
     n_total = len(y_true)
     n_pos = np.sum(y_true == 1)
     net_benefit = np.zeros_like(thresholds)
+    net_benefit = force_1d_array(net_benefit, name="net_benefit")
     for i, t in enumerate(thresholds):
         if t <= 0 or t >= 1:
             net_benefit[i] = 0
@@ -54,6 +72,7 @@ def calculate_net_benefit_none(thresholds):
 def bootstrap_dca(y_true, y_proba, n_boot=1000, seed=42):
     np.random.seed(seed)
     thresholds = np.linspace(0.01, 0.99, 100)
+    thresholds = force_1d_array(thresholds, name="thresholds") 
     boot_nb = np.zeros((n_boot, len(thresholds)))
 
     for i in tqdm(range(n_boot), desc="Bootstrapping DCA"):
@@ -119,3 +138,4 @@ if __name__ == "__main__":
 
     # 绘制三条核心曲线
     plot_dca_curves(thresholds, mean_nb, lb_nb, ub_nb, nb_all, nb_none)
+
