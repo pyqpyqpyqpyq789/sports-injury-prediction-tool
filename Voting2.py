@@ -672,17 +672,17 @@ def Explain(model_results, sample_id, model_metr, target, names, project_path):
     # plt.savefig(project_path + 'plots/summary.jpg', dpi=300, bbox_inches='tight', facecolor='none', edgecolor='none')
     # plt.close()
 
-    shap.summary_plot(merged_shap, X.iloc[X_id], plot_type="bar", show=False)
-    plt.title('SHAP feature importance')
-    plt.tight_layout()
-    plt.savefig(project_path + 'plots/bar.jpg', dpi=300, bbox_inches='tight')
-    plt.close()
-    #
-    shap.summary_plot(merged_shap, X.iloc[X_id], show=False)
-    plt.title('SHAP bees warm plot')
-    plt.tight_layout()
-    plt.savefig(project_path + 'plots/summary.jpg', dpi=300, bbox_inches='tight')
-    plt.close()
+    # shap.summary_plot(merged_shap, X.iloc[X_id], plot_type="bar", show=False)
+    # plt.title('SHAP feature importance')
+    # plt.tight_layout()
+    # plt.savefig(project_path + 'plots/bar.jpg', dpi=300, bbox_inches='tight')
+    # plt.close()
+    # #
+    # shap.summary_plot(merged_shap, X.iloc[X_id], show=False)
+    # plt.title('SHAP bees warm plot')
+    # plt.tight_layout()
+    # plt.savefig(project_path + 'plots/summary.jpg', dpi=300, bbox_inches='tight')
+    # plt.close()
 
     # shap.initjs()
     # shap.save_html(project_path + 'plots/force_plot.html',
@@ -800,6 +800,7 @@ if __name__ == "__main__":
     if not os.path.exists(project_path+'plots'):
         os.makedirs(project_path+'plots')
     main()
+
 
 
 
