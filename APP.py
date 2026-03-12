@@ -119,7 +119,7 @@ if page == "项目介绍":
             local_image_path,
             caption="机器学习分析全流程示意图",
             width=1500,
-            use_container_width=False
+            #use_container_width=False
         )
     except FileNotFoundError:
         st.warning("未找到本地示意图文件，请确认图片路径正确！")
@@ -543,3 +543,4 @@ if st.sidebar.button("清理所有数据"):
     st.session_state.clear()
     st.success("所有临时数据已清理")
     st.rerun()
+
