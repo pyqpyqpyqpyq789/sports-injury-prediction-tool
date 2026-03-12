@@ -689,18 +689,39 @@ def Explain(model_results, sample_id, model_metr, target, names, project_path):
     #                shap.force_plot(Expected, merged_shap, X.iloc[X_id]))
 
     # 绘制shap决策图
-    error_indices = np.where(y_pred_list != y_list)[0]
+    # error_indices = np.where(y_pred_list != y_list)[0]
+    # print('error_indices', error_indices)
+    # # # 多样本可视化探索
+    # shap.decision_plot(Expected, merged_shap, X.iloc[X_id],
+    #                    highlight=error_indices,  # 突出显示错误样本（核心参数）
+    #                    show=False,
+    #                    ignore_warnings=True)
+    # plt.title('SHAP decision plot')
+    # plt.tight_layout()
+    # plt.savefig(project_path + 'plots/decision.jpg', dpi=300, bbox_inches='tight')
+    # plt.close()
+    # Deci_plot(y_pred=y_pred_list, y_true=y_true_list, sample_index=3)  # 绘制shap决策图
+    
+    error_mask = (y_pred_list != y_list)  # 先得到布尔数组
+    error_indices = np.where(error_mask)[0]  # 原逻辑
+    error_indices = np.atleast_1d(error_indices)  # 强制一维，即使空数组也保持一维
+
+    # 2. 兜底处理：空数组时设为None（SHAP兼容None，不高亮任何样本）
+    if len(error_indices) == 0:
+        error_indices = None
     print('error_indices', error_indices)
-    # # 多样本可视化探索
-    shap.decision_plot(Expected, merged_shap, X.iloc[X_id],
-                       highlight=error_indices,  # 突出显示错误样本（核心参数）
+
+    # 3. 调用shap.decision_plot（修复highlight参数）
+    shap.decision_plot(Expected, merged_shap, X.iloc[X_id], 
+                       highlight=error_indices,  # 此时要么是一维数组，要么是None
                        show=False,
-                       ignore_warnings=True)
+                       ignore_warnings=True
+                      )
+
     plt.title('SHAP decision plot')
     plt.tight_layout()
     plt.savefig(project_path + 'plots/decision.jpg', dpi=300, bbox_inches='tight')
     plt.close()
-    # Deci_plot(y_pred=y_pred_list, y_true=y_true_list, sample_index=3)  # 绘制shap决策图
 
     # 指定样本绘制瀑布图
     # sample_index = 19
@@ -800,6 +821,7 @@ if __name__ == "__main__":
     if not os.path.exists(project_path+'plots'):
         os.makedirs(project_path+'plots')
     main()
+
 
 
 
