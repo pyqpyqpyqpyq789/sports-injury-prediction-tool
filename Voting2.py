@@ -650,17 +650,17 @@ def Explain(model_results, sample_id, model_metr, target, names, project_path):
 
     # --------------- 绘制论文级校准曲线 ---------------
     os.makedirs(project_path+'plots/', exist_ok=True)
-    plot_paper_calibration(
-            y_true=y_list,
-            y_proba=y_positive_proba,
-            model_name=names,
-            n_bins=10,  # 10组分组（论文常用）
-            n_boot=1000,  # 1000次Bootstrapping
-            plot_youden=True,  # 标注Youden J阈值（可选关闭）
-            save_path=project_path + "plots/calibration_curve.jpg"  # 保存为PDF（矢量图）
-        )
-    # --------------- Bootstrapping计算DCA ---------------
-    print('阳性样本数量：', np.sum(np.array(y_list) == 1))
+    # plot_paper_calibration(
+    #         y_true=y_list,
+    #         y_proba=y_positive_proba,
+    #         model_name=names,
+    #         n_bins=10,  # 10组分组（论文常用）
+    #         n_boot=1000,  # 1000次Bootstrapping
+    #         plot_youden=True,  # 标注Youden J阈值（可选关闭）
+    #         save_path=project_path + "plots/calibration_curve.jpg"  # 保存为PDF（矢量图）
+    #     )
+    # # --------------- Bootstrapping计算DCA ---------------
+    # print('阳性样本数量：', np.sum(np.array(y_list) == 1))
     # Bootstrap计算DCA数据
     # thresholds, mean_nb, lb_nb, ub_nb, nb_all, nb_none = bootstrap_dca(np.array(y_list), np.array(y_positive_proba), n_boot=1000)
     # print(f"thresholds 维度：{thresholds.ndim}")
@@ -800,6 +800,7 @@ if __name__ == "__main__":
     if not os.path.exists(project_path+'plots'):
         os.makedirs(project_path+'plots')
     main()
+
 
 
 
