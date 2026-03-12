@@ -35,8 +35,8 @@ import scipy.stats as stats
 # from MLstatkit.stats import Delong_test
 import shap
 from pdpbox import pdp
-from dtreeviz.trees import *
-os.environ["PATH"] += os.pathsep + 'C:/Program Files/Graphviz/bin/'
+# from dtreeviz.trees import *
+# os.environ["PATH"] += os.pathsep + 'C:/Program Files/Graphviz/bin/'
 import pickle
 
 
@@ -735,4 +735,5 @@ def base_ml_train(classifiers, project_path, input_path, output_file, K=5):
 #         ("XGBoost", XGBClassifier(eval_metric='logloss', use_label_encoder=False))
 #     ]
 #
+
 #     base_ml_train(classifiers, project_path, input_path, output_file, K=5)
