@@ -221,9 +221,12 @@ LANGUAGES = {
     }
 }
 
-# 初始化语言状态（默认中文）
+# # 初始化语言状态（默认中文）
+# if 'lang' not in st.session_state:
+#     st.session_state.lang = "zh"
+# 初始化语言状态（默认英文）
 if 'lang' not in st.session_state:
-    st.session_state.lang = "zh"
+    st.session_state.lang = "en"
 
 # 获取当前语言的翻译函数
 def t(key):
@@ -757,3 +760,4 @@ if st.sidebar.button(t("clean_all")):
     st.session_state.clear()
     st.success(t("clean_all_success"))
     st.rerun()
+
